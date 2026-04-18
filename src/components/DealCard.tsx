@@ -39,7 +39,7 @@ export function DealCard({ deal, onViewHistory }: Props) {
             <span>{deal.airline}</span>
             <span style={{ color: 'var(--border)' }}>|</span>
             <span>
-              {formatDate(deal.departDate)} \u2014 {formatDate(deal.returnDate)}
+              {formatDate(deal.departDate)} {'\u2014'} {formatDate(deal.returnDate)}
             </span>
           </div>
         </div>

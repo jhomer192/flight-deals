@@ -21,7 +21,7 @@ export function AirportInput({ value, onChange, placeholder, allowAnywhere, labe
     if (value && !selectedLabel) {
       const airports = searchAirports(value, 1);
       if (airports.length > 0) {
-        setSelectedLabel(`${airports[0].code} \u2014 ${airports[0].city}`);
+        setSelectedLabel(`${airports[0].code} {'\u2014'}${airports[0].city}`);
       } else if (value === 'anywhere') {
         setSelectedLabel('Anywhere');
       }
@@ -50,7 +50,7 @@ export function AirportInput({ value, onChange, placeholder, allowAnywhere, labe
 
   function select(airport: Airport) {
     onChange(airport.code);
-    setSelectedLabel(`${airport.code} \u2014 ${airport.city}`);
+    setSelectedLabel(`${airport.code} {'\u2014'}${airport.city}`);
     setQuery('');
     setResults([]);
     setOpen(false);
@@ -115,7 +115,7 @@ export function AirportInput({ value, onChange, placeholder, allowAnywhere, labe
               className="w-full text-left px-3 py-2 text-sm border-b"
               style={{ color: 'var(--accent-2)', borderColor: 'var(--border)' }}
             >
-              Anywhere \u2014 find deals to any destination
+              Anywhere {'\u2014'}find deals to any destination
             </button>
           )}
           {results.map((a) => (
