@@ -17,10 +17,13 @@ function formatDate(iso: string): string {
 }
 
 function buildBookingUrl(deal: Deal): string {
-  // Google Flights URL with route and dates
-  const depart = deal.departDate; // YYYY-MM-DD
-  const ret = deal.returnDate;
-  return `https://www.google.com/travel/flights?q=Flights+from+${deal.origin}+to+${deal.destination}+on+${depart}+return+${ret}`;
+  const params = new URLSearchParams({
+    hl: 'en',
+    gl: 'us',
+    curr: 'USD',
+  });
+  // Kayak works reliably with IATA codes and dates in the URL
+  return `https://www.kayak.com/flights/${deal.origin}-${deal.destination}/${deal.departDate}/${deal.returnDate}?sort=bestflight_a`;
 }
 
 export function DealCard({ deal, onViewHistory }: Props) {
@@ -68,18 +71,27 @@ export function DealCard({ deal, onViewHistory }: Props) {
       <div className="mt-3 flex items-center justify-between">
         <button
           onClick={() => onViewHistory(deal.origin, deal.destination)}
-          className="text-xs transition-colors"
+          className="text-xs transition-colors cursor-pointer"
           style={{ color: 'var(--accent-2)' }}
         >
           View price history &rarr;
         </button>
-        <button
-          onClick={() => window.open(buildBookingUrl(deal), '_blank', 'noopener')}
-          className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-          style={{ backgroundColor: 'var(--accent)', color: 'var(--bg)' }}
-        >
-          Book Now &rarr;
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => window.open(`https://www.google.com/travel/flights?q=Flights+${deal.origin}+to+${deal.destination}+on+${deal.departDate}+return+${deal.returnDate}`, '_blank', 'noopener')}
+            className="text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer border"
+            style={{ color: 'var(--accent)', borderColor: 'var(--accent)', backgroundColor: 'transparent' }}
+          >
+            Google
+          </button>
+          <button
+            onClick={() => window.open(buildBookingUrl(deal), '_blank', 'noopener')}
+            className="text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+            style={{ backgroundColor: 'var(--accent)', color: 'var(--bg)' }}
+          >
+            Kayak &rarr;
+          </button>
+        </div>
       </div>
     </div>
   );
