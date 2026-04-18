@@ -16,6 +16,13 @@ function formatDate(iso: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+function buildBookingUrl(deal: Deal): string {
+  // Google Flights URL with route and dates
+  const depart = deal.departDate; // YYYY-MM-DD
+  const ret = deal.returnDate;
+  return `https://www.google.com/travel/flights?q=Flights+from+${deal.origin}+to+${deal.destination}+on+${depart}+return+${ret}`;
+}
+
 export function DealCard({ deal, onViewHistory }: Props) {
   return (
     <div className="border rounded-xl p-4 transition-colors" style={{ backgroundColor: 'color-mix(in srgb, var(--surface) 60%, transparent)', borderColor: 'var(--border)' }}>
@@ -58,13 +65,22 @@ export function DealCard({ deal, onViewHistory }: Props) {
         </div>
       </div>
 
-      <button
-        onClick={() => onViewHistory(deal.origin, deal.destination)}
-        className="mt-3 text-xs transition-colors"
-        style={{ color: 'var(--accent-2)' }}
-      >
-        View price history &rarr;
-      </button>
+      <div className="mt-3 flex items-center justify-between">
+        <button
+          onClick={() => onViewHistory(deal.origin, deal.destination)}
+          className="text-xs transition-colors"
+          style={{ color: 'var(--accent-2)' }}
+        >
+          View price history &rarr;
+        </button>
+        <button
+          onClick={() => window.open(buildBookingUrl(deal), '_blank', 'noopener')}
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+          style={{ backgroundColor: 'var(--accent)', color: 'var(--bg)' }}
+        >
+          Book Now &rarr;
+        </button>
+      </div>
     </div>
   );
 }
