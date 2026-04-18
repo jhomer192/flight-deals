@@ -17,12 +17,6 @@ function formatDate(iso: string): string {
 }
 
 function buildBookingUrl(deal: Deal): string {
-  const params = new URLSearchParams({
-    hl: 'en',
-    gl: 'us',
-    curr: 'USD',
-  });
-  // Kayak works reliably with IATA codes and dates in the URL
   return `https://www.kayak.com/flights/${deal.origin}-${deal.destination}/${deal.departDate}/${deal.returnDate}?sort=bestflight_a`;
 }
 
