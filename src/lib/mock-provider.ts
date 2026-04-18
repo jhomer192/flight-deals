@@ -125,12 +125,36 @@ export class MockFlightDataProvider implements FlightDataProvider {
         );
         const checkDates = Math.min(rangeDays, 10);
 
+        // Determine return date range
+        const retStart = watch.returnRangeStart ? new Date(watch.returnRangeStart) : null;
+        const retEnd = watch.returnRangeEnd ? new Date(watch.returnRangeEnd) : null;
+
         for (let i = 0; i < checkDates; i++) {
           const dayInRange = Math.floor((i / checkDates) * rangeDays);
           const departDate = new Date(start);
           departDate.setDate(departDate.getDate() + dayInRange);
+
+          // Filter by day of week if watchDays is set
+          if (watch.watchDays && watch.watchDays.length > 0) {
+            if (!watch.watchDays.includes(departDate.getDay())) continue;
+          }
+
+          // Calculate return date
           const returnDate = new Date(departDate);
-          returnDate.setDate(returnDate.getDate() + 7); // assume 7-day trip
+          if (retStart && retEnd) {
+            // Pick a return date within the return range
+            const retRangeDays = Math.max(1, Math.floor((retEnd.getTime() - retStart.getTime()) / 86400000));
+            const retDayOffset = Math.floor((i / checkDates) * retRangeDays);
+            returnDate.setTime(retStart.getTime());
+            returnDate.setDate(returnDate.getDate() + retDayOffset);
+            // Ensure return is after departure
+            if (returnDate <= departDate) {
+              returnDate.setTime(departDate.getTime());
+              returnDate.setDate(returnDate.getDate() + 3);
+            }
+          } else {
+            returnDate.setDate(returnDate.getDate() + 7); // default 7-day trip
+          }
 
           const dayOffset = Math.floor(
             (departDate.getTime() - today.getTime()) / 86400000,

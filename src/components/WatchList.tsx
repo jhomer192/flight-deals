@@ -45,8 +45,14 @@ export function WatchList({ watches, onDelete, onSelect, selectedId }: Props) {
                 {formatAirport(w.destination)}
               </span>
             </div>
-            <div className="text-xs mt-1" style={{ color: 'var(--text-dim)' }}>
-              Under ${w.maxBudget} &middot; {w.dateRangeStart} to {w.dateRangeEnd}
+            <div className="text-xs mt-1 space-y-0.5" style={{ color: 'var(--text-dim)' }}>
+              <div>Under ${w.maxBudget} &middot; Depart {w.dateRangeStart} to {w.dateRangeEnd}</div>
+              {w.returnRangeStart && w.returnRangeEnd && (
+                <div>Return {w.returnRangeStart} to {w.returnRangeEnd}</div>
+              )}
+              {w.watchDays && w.watchDays.length > 0 && (
+                <div>{w.watchDays.map(d => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join(', ')} only</div>
+              )}
             </div>
           </div>
           <button

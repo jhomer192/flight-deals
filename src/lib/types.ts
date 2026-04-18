@@ -10,8 +10,11 @@ export interface Watch {
   homeAirport: string;
   destination: string; // IATA code or "anywhere"
   maxBudget: number;
-  dateRangeStart: string; // ISO date string
-  dateRangeEnd: string;
+  dateRangeStart: string; // ISO date string -- earliest departure
+  dateRangeEnd: string;   // latest departure
+  returnRangeStart?: string; // earliest return (optional, defaults to departure dates)
+  returnRangeEnd?: string;   // latest return
+  watchDays?: number[];   // days of week to watch: 0=Sun, 1=Mon, ..., 6=Sat
   createdAt: string;
 }
 
