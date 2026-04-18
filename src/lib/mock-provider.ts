@@ -123,21 +123,23 @@ export class MockFlightDataProvider implements FlightDataProvider {
           1,
           Math.floor((end.getTime() - start.getTime()) / 86400000),
         );
-        const checkDates = Math.min(rangeDays, 10);
 
         // Determine return date range
         const retStart = watch.returnRangeStart ? new Date(watch.returnRangeStart) : null;
         const retEnd = watch.returnRangeEnd ? new Date(watch.returnRangeEnd) : null;
 
+        // When day filtering is on, check every day in range.
+        // Otherwise sample up to 10 evenly spaced dates.
+        const hasDayFilter = watch.watchDays && watch.watchDays.length > 0;
+        const checkDates = hasDayFilter ? rangeDays : Math.min(rangeDays, 10);
+
         for (let i = 0; i < checkDates; i++) {
-          const dayInRange = Math.floor((i / checkDates) * rangeDays);
+          const dayInRange = hasDayFilter ? i : Math.floor((i / checkDates) * rangeDays);
           const departDate = new Date(start);
           departDate.setDate(departDate.getDate() + dayInRange);
 
-          // Filter by day of week if watchDays is set
-          if (watch.watchDays && watch.watchDays.length > 0) {
-            if (!watch.watchDays.includes(departDate.getDay())) continue;
-          }
+          // Filter by day of week
+          if (hasDayFilter && !watch.watchDays!.includes(departDate.getDay())) continue;
 
           // Calculate return date
           const returnDate = new Date(departDate);
