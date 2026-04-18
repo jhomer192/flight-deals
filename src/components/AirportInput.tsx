@@ -21,7 +21,7 @@ export function AirportInput({ value, onChange, placeholder, allowAnywhere, labe
     if (value && !selectedLabel) {
       const airports = searchAirports(value, 1);
       if (airports.length > 0) {
-        setSelectedLabel(`${airports[0].code} — ${airports[0].city}`);
+        setSelectedLabel(`${airports[0].code} \u2014 ${airports[0].city}`);
       } else if (value === 'anywhere') {
         setSelectedLabel('Anywhere');
       }
@@ -50,7 +50,7 @@ export function AirportInput({ value, onChange, placeholder, allowAnywhere, labe
 
   function select(airport: Airport) {
     onChange(airport.code);
-    setSelectedLabel(`${airport.code} — ${airport.city}`);
+    setSelectedLabel(`${airport.code} \u2014 ${airport.city}`);
     setQuery('');
     setResults([]);
     setOpen(false);
@@ -80,16 +80,17 @@ export function AirportInput({ value, onChange, placeholder, allowAnywhere, labe
 
   return (
     <div ref={ref} className="relative">
-      <label className="block text-sm font-medium text-slate-400 mb-1">
+      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-dim)' }}>
         {label}
       </label>
       {value ? (
-        <div className="flex items-center gap-2 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2">
-          <span className="text-white flex-1 text-sm">{selectedLabel}</span>
+        <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--border)' }}>
+          <span className="flex-1 text-sm" style={{ color: 'var(--text)' }}>{selectedLabel}</span>
           <button
             type="button"
             onClick={clear}
-            className="text-slate-400 hover:text-white text-lg leading-none"
+            className="text-lg leading-none"
+            style={{ color: 'var(--text-dim)' }}
           >
             &times;
           </button>
@@ -101,18 +102,20 @@ export function AirportInput({ value, onChange, placeholder, allowAnywhere, labe
           onChange={(e) => handleInput(e.target.value)}
           onFocus={handleFocus}
           placeholder={placeholder ?? 'Search airports...'}
-          className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500"
+          className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
+          style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }}
         />
       )}
       {open && !value && (
-        <div className="absolute z-50 w-full mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-xl max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 rounded-lg shadow-xl max-h-60 overflow-auto" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
           {allowAnywhere && (
             <button
               type="button"
               onClick={selectAnywhere}
-              className="w-full text-left px-3 py-2 hover:bg-slate-700 text-blue-400 text-sm border-b border-slate-700"
+              className="w-full text-left px-3 py-2 text-sm border-b"
+              style={{ color: 'var(--accent-2)', borderColor: 'var(--border)' }}
             >
-              Anywhere — find deals to any destination
+              Anywhere \u2014 find deals to any destination
             </button>
           )}
           {results.map((a) => (
@@ -120,17 +123,20 @@ export function AirportInput({ value, onChange, placeholder, allowAnywhere, labe
               type="button"
               key={a.code}
               onClick={() => select(a)}
-              className="w-full text-left px-3 py-2 hover:bg-slate-700 text-sm"
+              className="w-full text-left px-3 py-2 text-sm transition-colors"
+              style={{ color: 'var(--text)' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--border)')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
             >
-              <span className="text-white font-mono font-bold">{a.code}</span>
-              <span className="text-slate-400 ml-2">
+              <span className="font-mono font-bold">{a.code}</span>
+              <span className="ml-2" style={{ color: 'var(--text-dim)' }}>
                 {a.city}, {a.country}
               </span>
-              <span className="text-slate-500 ml-1 text-xs">— {a.name}</span>
+              <span className="ml-1 text-xs" style={{ color: 'var(--text-dim)' }}>\u2014 {a.name}</span>
             </button>
           ))}
           {query.trim().length > 0 && results.length === 0 && (
-            <div className="px-3 py-2 text-slate-500 text-sm">
+            <div className="px-3 py-2 text-sm" style={{ color: 'var(--text-dim)' }}>
               No airports found
             </div>
           )}

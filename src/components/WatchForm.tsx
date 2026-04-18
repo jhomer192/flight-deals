@@ -41,7 +41,8 @@ export function WatchForm({ onAdd }: Props) {
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+        className="w-full font-semibold py-3 px-6 rounded-xl transition-colors"
+        style={{ backgroundColor: 'var(--accent)', color: 'var(--bg)' }}
       >
         + Add Watch
       </button>
@@ -53,9 +54,10 @@ export function WatchForm({ onAdd }: Props) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 space-y-4"
+      className="border rounded-xl p-5 space-y-4"
+      style={{ backgroundColor: 'color-mix(in srgb, var(--surface) 50%, transparent)', borderColor: 'var(--border)' }}
     >
-      <h3 className="text-lg font-semibold text-white">New Price Watch</h3>
+      <h3 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>New Price Watch</h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <AirportInput
@@ -74,11 +76,11 @@ export function WatchForm({ onAdd }: Props) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-400 mb-1">
+        <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-dim)' }}>
           Max Budget (round-trip, USD)
         </label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-dim)' }}>
             $
           </span>
           <input
@@ -89,14 +91,15 @@ export function WatchForm({ onAdd }: Props) {
             value={maxBudget}
             onChange={(e) => setMaxBudget(e.target.value)}
             placeholder="500"
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg pl-7 pr-3 py-2 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500"
+            className="w-full rounded-lg pl-7 pr-3 py-2 text-sm focus:outline-none"
+            style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-400 mb-1">
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-dim)' }}>
             Earliest Departure
           </label>
           <input
@@ -104,11 +107,12 @@ export function WatchForm({ onAdd }: Props) {
             min={today}
             value={dateStart}
             onChange={(e) => setDateStart(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500 [color-scheme:dark]"
+            className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none [color-scheme:dark]"
+            style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-400 mb-1">
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-dim)' }}>
             Latest Departure
           </label>
           <input
@@ -116,7 +120,8 @@ export function WatchForm({ onAdd }: Props) {
             min={dateStart || today}
             value={dateEnd}
             onChange={(e) => setDateEnd(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500 [color-scheme:dark]"
+            className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none [color-scheme:dark]"
+            style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text)' }}
           />
         </div>
       </div>
@@ -125,14 +130,16 @@ export function WatchForm({ onAdd }: Props) {
         <button
           type="submit"
           disabled={!homeAirport || !destination || !maxBudget || !dateStart || !dateEnd}
-          className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors"
+          className="flex-1 font-semibold py-2.5 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ backgroundColor: 'var(--accent)', color: 'var(--bg)' }}
         >
           Start Watching
         </button>
         <button
           type="button"
           onClick={() => setExpanded(false)}
-          className="px-4 py-2.5 text-slate-400 hover:text-white transition-colors"
+          className="px-4 py-2.5 transition-colors"
+          style={{ color: 'var(--text-dim)' }}
         >
           Cancel
         </button>

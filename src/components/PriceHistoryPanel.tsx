@@ -33,9 +33,9 @@ export function PriceHistoryPanel({ origin, destination, onClose }: Props) {
   const avg = values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0;
 
   return (
-    <div className="bg-slate-800/70 border border-slate-700 rounded-xl p-5">
+    <div className="border rounded-xl p-5" style={{ backgroundColor: 'color-mix(in srgb, var(--surface) 70%, transparent)', borderColor: 'var(--border)' }}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-white font-semibold">
+        <h3 className="font-semibold" style={{ color: 'var(--text)' }}>
           30-Day Price History:{' '}
           <span className="font-mono">
             {origin} ({originLabel?.city ?? '?'})
@@ -47,14 +47,15 @@ export function PriceHistoryPanel({ origin, destination, onClose }: Props) {
         </h3>
         <button
           onClick={onClose}
-          className="text-slate-400 hover:text-white text-xl leading-none"
+          className="text-xl leading-none"
+          style={{ color: 'var(--text-dim)' }}
         >
           &times;
         </button>
       </div>
 
       {loading ? (
-        <div className="h-32 flex items-center justify-center text-slate-500">
+        <div className="h-32 flex items-center justify-center" style={{ color: 'var(--text-dim)' }}>
           Loading price data...
         </div>
       ) : (
@@ -62,16 +63,16 @@ export function PriceHistoryPanel({ origin, destination, onClose }: Props) {
           <Sparkline prices={prices} width={500} height={160} />
           <div className="grid grid-cols-3 gap-4 mt-4 text-center">
             <div>
-              <div className="text-xs text-slate-500 uppercase tracking-wide">Lowest</div>
-              <div className="text-lg font-bold text-green-400">${min}</div>
+              <div className="text-xs uppercase tracking-wide" style={{ color: 'var(--text-dim)' }}>Lowest</div>
+              <div className="text-lg font-bold" style={{ color: 'var(--accent)' }}>${min}</div>
             </div>
             <div>
-              <div className="text-xs text-slate-500 uppercase tracking-wide">Average</div>
-              <div className="text-lg font-bold text-slate-300">${avg}</div>
+              <div className="text-xs uppercase tracking-wide" style={{ color: 'var(--text-dim)' }}>Average</div>
+              <div className="text-lg font-bold" style={{ color: 'var(--text)' }}>${avg}</div>
             </div>
             <div>
-              <div className="text-xs text-slate-500 uppercase tracking-wide">Highest</div>
-              <div className="text-lg font-bold text-red-400">${max}</div>
+              <div className="text-xs uppercase tracking-wide" style={{ color: 'var(--text-dim)' }}>Highest</div>
+              <div className="text-lg font-bold" style={{ color: 'var(--accent-3)' }}>${max}</div>
             </div>
           </div>
         </>

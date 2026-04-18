@@ -1,9 +1,10 @@
 @import "tailwindcss";
+@import "./themes.css";
 
 body {
   margin: 0;
-  background: #0f172a;
-  color: #e2e8f0;
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 #root {

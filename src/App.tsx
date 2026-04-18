@@ -7,6 +7,7 @@ import { WatchList } from './components/WatchList';
 import { DealFeed } from './components/DealFeed';
 import { DashboardStats } from './components/DashboardStats';
 import { PriceHistoryPanel } from './components/PriceHistoryPanel';
+import { ThemePicker } from './components/ThemePicker';
 
 const provider = new MockFlightDataProvider();
 
@@ -50,29 +51,31 @@ function App() {
     setHistoryRoute({ origin, destination });
   }
 
-  // Filter deals to selected watch if one is selected
   const visibleDeals = selectedWatch
     ? deals.filter((d) => d.watchId === selectedWatch.id)
     : deals;
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
       {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-40">
+      <header className="border-b sticky top-0 z-40 backdrop-blur-sm" style={{ borderColor: 'var(--border)', backgroundColor: 'color-mix(in srgb, var(--bg) 80%, transparent)' }}>
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--accent)' }}>
               <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
             </div>
-            <h1 className="text-xl font-bold text-white tracking-tight">
+            <h1 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>
               Flight Deals
             </h1>
           </div>
-          <div className="text-xs text-slate-500">
-            {watches.length} watch{watches.length !== 1 ? 'es' : ''} active
+          <div className="flex items-center gap-4">
+            <ThemePicker />
+            <div className="text-xs" style={{ color: 'var(--text-dim)' }}>
+              {watches.length} watch{watches.length !== 1 ? 'es' : ''} active
+            </div>
           </div>
         </div>
       </header>
@@ -85,11 +88,12 @@ function App() {
           {/* Sidebar: Watches */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-white">Watches</h2>
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Watches</h2>
               {selectedWatch && (
                 <button
                   onClick={() => setSelectedWatch(null)}
-                  className="text-xs text-blue-400 hover:text-blue-300"
+                  className="text-xs"
+                  style={{ color: 'var(--accent)' }}
                 >
                   Show all deals
                 </button>
@@ -107,20 +111,19 @@ function App() {
           {/* Main: Deal Feed */}
           <div className="lg:col-span-8 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-white">
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>
                 {selectedWatch ? 'Deals for Watch' : 'All Deals'}
                 {loading && (
-                  <span className="ml-2 text-sm text-slate-500 font-normal">
+                  <span className="ml-2 text-sm font-normal" style={{ color: 'var(--text-dim)' }}>
                     refreshing...
                   </span>
                 )}
               </h2>
-              <span className="text-sm text-slate-500">
+              <span className="text-sm" style={{ color: 'var(--text-dim)' }}>
                 {visibleDeals.length} deal{visibleDeals.length !== 1 ? 's' : ''} found
               </span>
             </div>
 
-            {/* Price history panel */}
             {historyRoute && (
               <PriceHistoryPanel
                 origin={historyRoute.origin}
@@ -135,7 +138,7 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 mt-12 py-6 text-center text-xs text-slate-600">
+      <footer className="border-t mt-12 py-6 text-center text-xs" style={{ borderColor: 'var(--border)', color: 'var(--text-dim)' }}>
         Flight Deals Watcher &middot; Mock data for demonstration &middot; Prices are simulated
       </footer>
     </div>
