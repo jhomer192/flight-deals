@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocalState } from './hooks/useLocalState';
-import { MockFlightDataProvider } from './lib/mock-provider';
+import { useFlightDataProvider } from './lib/provider-context';
 import type { Watch, Deal } from './lib/types';
 import { WatchForm } from './components/WatchForm';
 import { WatchList } from './components/WatchList';
@@ -9,9 +9,8 @@ import { DashboardStats } from './components/DashboardStats';
 import { PriceHistoryPanel } from './components/PriceHistoryPanel';
 import { ThemePicker } from './components/ThemePicker';
 
-const provider = new MockFlightDataProvider();
-
 function App() {
+  const { provider, isDemo, providerError, setProviderError } = useFlightDataProvider();
   const [watches, setWatches] = useLocalState<Watch[]>('flight-deals:watches', []);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [selectedWatch, setSelectedWatch] = useState<Watch | null>(null);
@@ -27,10 +26,17 @@ function App() {
       return;
     }
     setLoading(true);
-    const newDeals = await provider.getDeals(watches);
-    setDeals(newDeals);
-    setLoading(false);
-  }, [watches]);
+    try {
+      const newDeals = await provider.getDeals(watches);
+      setDeals(newDeals);
+      setProviderError(null);
+    } catch (err) {
+      setProviderError(err instanceof Error ? err.message : String(err));
+      setDeals([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [watches, provider, setProviderError]);
 
   useEffect(() => {
     refreshDeals();
@@ -57,6 +63,34 @@ function App() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
+      {/* Demo mode banner */}
+      {isDemo && (
+        <div
+          className="text-center text-sm py-2 px-4"
+          style={{
+            backgroundColor: 'color-mix(in srgb, var(--accent-2) 20%, var(--bg))',
+            color: 'var(--accent-2)',
+            borderBottom: '1px solid var(--border)',
+          }}
+        >
+          Demo mode &mdash; prices are simulated. Add Amadeus API keys for real prices.
+        </div>
+      )}
+
+      {/* Error banner */}
+      {providerError && (
+        <div
+          className="text-center text-sm py-2 px-4"
+          style={{
+            backgroundColor: 'color-mix(in srgb, var(--accent-3) 15%, var(--bg))',
+            color: 'var(--accent-3)',
+            borderBottom: '1px solid var(--border)',
+          }}
+        >
+          Amadeus API error: {providerError}
+        </div>
+      )}
+
       {/* Header */}
       <header className="border-b sticky top-0 z-40 backdrop-blur-sm" style={{ borderColor: 'var(--border)', backgroundColor: 'color-mix(in srgb, var(--bg) 80%, transparent)' }}>
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -139,7 +173,7 @@ function App() {
 
       {/* Footer */}
       <footer className="border-t mt-12 py-6 text-center text-xs" style={{ borderColor: 'var(--border)', color: 'var(--text-dim)' }}>
-        Flight Deals Watcher &middot; Mock data for demonstration &middot; Prices are simulated
+        Flight Deals Watcher &middot; {isDemo ? 'Mock data for demonstration \u00b7 Prices are simulated' : 'Powered by Amadeus API'}
       </footer>
     </div>
   );

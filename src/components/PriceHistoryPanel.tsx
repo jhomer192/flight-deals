@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { PricePoint } from '../lib/types';
-import { MockFlightDataProvider } from '../lib/mock-provider';
+import { useFlightDataProvider } from '../lib/provider-context';
 import { getAirport } from '../lib/airport-search';
 import { Sparkline } from './Sparkline';
 
@@ -10,9 +10,8 @@ interface Props {
   onClose: () => void;
 }
 
-const provider = new MockFlightDataProvider();
-
 export function PriceHistoryPanel({ origin, destination, onClose }: Props) {
+  const { provider } = useFlightDataProvider();
   const [prices, setPrices] = useState<PricePoint[]>([]);
   const [loading, setLoading] = useState(true);
 
