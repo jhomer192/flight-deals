@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+# Flight Deals Watcher
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A frontend-only SPA that monitors flight prices and alerts when deals drop below your budget threshold.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Watch Configuration**: Set home airport (fuzzy IATA code autocomplete from 507 airports), destination (or "anywhere"), budget, and travel dates
+- **Deal Feed**: Live list of deals below your threshold, sorted by savings percentage. Each card shows route, airline, price, dates, and savings
+- **Price History**: 30-day SVG sparkline chart per route with min/avg/max statistics
+- **Dashboard Stats**: Cheapest deal, average savings, active watches count
+- **Persistence**: All watches and settings saved to localStorage
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + TypeScript
+- Vite 8
+- Tailwind CSS v4 (dark theme)
+- No backend required — ships with a mock data provider
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Build
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build    # production build to dist/
+npx tsc --noEmit # type check
 ```
+
+## Architecture
+
+All data flows through a `FlightDataProvider` interface (`src/lib/types.ts`). The included `MockFlightDataProvider` generates realistic prices with seeded PRNG — deterministic per route and day, with occasional 30-50% deal drops.
+
+To plug in a real API (SerpAPI, Amadeus, Skyscanner), implement the `FlightDataProvider` interface and swap it in `App.tsx`.
+
+### Key files
+
+| Path | Description |
+|------|-------------|
+| `src/lib/types.ts` | Type definitions + FlightDataProvider interface |
+| `src/lib/mock-provider.ts` | Mock price engine with realistic fluctuations |
+| `src/lib/airport-search.ts` | Fuzzy airport search over bundled dataset |
+| `src/data/airports.json` | 507 major world airports |
+| `src/components/` | All UI components |
+| `src/hooks/useLocalState.ts` | localStorage-backed React state hook |
