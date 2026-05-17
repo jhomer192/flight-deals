@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocalState } from './hooks/useLocalState';
 import { useFlightDataProvider } from './lib/provider-context';
 import type { Watch, Deal } from './lib/types';
@@ -8,6 +8,21 @@ import { DealFeed } from './components/DealFeed';
 import { DashboardStats } from './components/DashboardStats';
 import { PriceHistoryPanel } from './components/PriceHistoryPanel';
 import { ThemePicker } from './components/ThemePicker';
+
+const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+
+/** Deduplicate deals: keep only the cheapest per (origin, destination) route. */
+function deduplicateDeals(deals: Deal[]): Deal[] {
+  const best = new Map<string, Deal>();
+  for (const deal of deals) {
+    const key = `${deal.origin}:${deal.destination}`;
+    const existing = best.get(key);
+    if (!existing || deal.price < existing.price) {
+      best.set(key, deal);
+    }
+  }
+  return Array.from(best.values());
+}
 
 function App() {
   const { provider, isDemo, providerError, setProviderError } = useFlightDataProvider();
@@ -19,28 +34,68 @@ function App() {
     destination: string;
   } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isBackgroundRefresh, setIsBackgroundRefresh] = useState(false);
+  const [lastChecked, setLastChecked] = useState<Date | null>(null);
+  const [minutesAgo, setMinutesAgo] = useState<number>(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const refreshDeals = useCallback(async () => {
+  const refreshDeals = useCallback(async (background = false) => {
     if (watches.length === 0) {
       setDeals([]);
       return;
     }
-    setLoading(true);
+    if (background) {
+      setIsBackgroundRefresh(true);
+    } else {
+      setLoading(true);
+    }
     try {
       const newDeals = await provider.getDeals(watches);
-      setDeals(newDeals);
+      setDeals(deduplicateDeals(newDeals));
+      setLastChecked(new Date());
+      setMinutesAgo(0);
       setProviderError(null);
     } catch (err) {
       setProviderError(err instanceof Error ? err.message : String(err));
       setDeals([]);
     } finally {
       setLoading(false);
+      setIsBackgroundRefresh(false);
     }
   }, [watches, provider, setProviderError]);
 
+  // Initial fetch + set up 30-minute polling interval
   useEffect(() => {
     refreshDeals();
-  }, [refreshDeals]);
+
+    if (watches.length === 0) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
+
+    intervalRef.current = setInterval(() => {
+      refreshDeals(true);
+    }, REFRESH_INTERVAL_MS);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [refreshDeals, watches.length]);
+
+  // Tick the "X min ago" counter every minute
+  useEffect(() => {
+    if (!lastChecked) return;
+    const tick = setInterval(() => {
+      setMinutesAgo(Math.floor((Date.now() - lastChecked.getTime()) / 60_000));
+    }, 60_000);
+    return () => clearInterval(tick);
+  }, [lastChecked]);
 
   function addWatch(watch: Watch) {
     setWatches((prev) => [...prev, watch]);
@@ -150,6 +205,16 @@ function App() {
                 {loading && (
                   <span className="ml-2 text-sm font-normal" style={{ color: 'var(--text-dim)' }}>
                     refreshing...
+                  </span>
+                )}
+                {!loading && isBackgroundRefresh && (
+                  <span className="ml-2 text-sm font-normal" style={{ color: 'var(--text-dim)' }}>
+                    auto-refreshing...
+                  </span>
+                )}
+                {!loading && !isBackgroundRefresh && lastChecked && (
+                  <span className="ml-2 text-sm font-normal" style={{ color: 'var(--text-dim)' }}>
+                    checked {minutesAgo === 0 ? 'just now' : `${minutesAgo}m ago`}
                   </span>
                 )}
               </h2>
